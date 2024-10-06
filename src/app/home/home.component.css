@@ -1,0 +1,27 @@
+.categorisbox{
+    border-radius: 5px;
+    text-align: center;
+    background-color: #fff;
+
+}
+
+.categorisbox a {
+    text-decoration: none;
+    color: #000;
+}
+
+.categorisContent {
+    padding: 20px 20px;
+}
+
+.categorisContent img{
+    object-fit: contain;
+    border-radius: 50%;
+    border: 2px solid rgb(54,16,244);
+}
+
+.categorisContent h4 {
+    margin-top: 15px;
+    font-size: 18px;
+    
+}

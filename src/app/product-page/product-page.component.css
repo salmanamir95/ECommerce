@@ -1,0 +1,31 @@
+.pagebox{
+    padding: 50px 50px;
+    margin: 50px 0px;
+    background-color: white;
+
+}
+
+.pagecontent{
+    padding: 10px 40px;
+    margin: 50px 0px;
+    background-color: white;
+
+}
+
+.pagecontent img {
+    width: 50%;
+}
+
+.pagecontent h4{
+    font-weight: bold;
+    font-size: 16px;
+}
+
+@media screen and (max-width : 600px) {
+    .pageBox img{
+        padding: 0px 10px;
+        
+    }
+
+
+}
