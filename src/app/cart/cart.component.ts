@@ -42,6 +42,35 @@ export class CartComponent implements OnInit {
     this.getCartData = this.dataStorage.getCartData();
   }
 
-
+  plusMinusCount(data: any, thing : string)
+  {
+    this.storeCartArray = [];
+    this.totalAmount=0;
+    var plusMinusVal= data.plusMinusCounter;
+    if (thing == 'plus'){
+      plusMinusVal= plusMinusVal + 1;
+      this.getCartData.filter(
+        (ele:any) => {
+          if (ele.id == data.id)
+            ele['plusMinusCounter']= plusMinusVal;
+          this.totalAmount= ele.price * ele.plusMinusCounter + this.totalAmount; 
+        }
+        
+      );
+    }
+    else if (thing == 'minus'){
+      plusMinusVal= plusMinusVal - 1;
+      this.getCartData.filter(
+        (ele:any) => {
+          if (ele.id == data.id)
+            ele['plusMinusCounter']= plusMinusVal;
+          this.totalAmount= ele.price * ele.plusMinusCounter + this.totalAmount; 
+        }
+      );
+    }
+    this.storeCartArray = this.getCartData;
+    this.dataStorage.storeCartData(this.storeCartArray);
+    this.getCartData= this.dataStorage.getCartData();
+  }
 
 }

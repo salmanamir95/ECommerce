@@ -49,6 +49,7 @@ export class ProductDetailsComponent implements OnInit {
 
   addCart(data: any): void {
     // Add product to cart and store it in local storage
+    data['plusMinusCounter'] = 0;
     this.storeCartData.push(data);
     this.dataStorage.storeCartData(this.storeCartData);
     this.router.navigate(['/cart']); // Redirect to cart page
