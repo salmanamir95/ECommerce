@@ -1,4 +1,3 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "compileOnSave": false,
   "compilerOptions": {
@@ -22,6 +21,39 @@
     "lib": [
       "ES2022",
       "dom"
+    ],
+    // "typeRoots": [
+    //   "node_modules/@types"  // Ensure type definitions are sourced from node_modules
+    // ],
+    // "types": [
+    //   "node", 
+    //   "body-parser", 
+    //   "bonjour", 
+    //   "connect", 
+    //   "cors", 
+    //   "http-errors", 
+    //   "http-proxy", 
+    //   "jasmine", 
+    //   "json-schema", 
+    //   "mime", 
+    //   "range-parser", 
+    //   "send", 
+    //   "sockjs"
+    // ]
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "types": [
+      "node",
+      "body-parser",
+      "bonjour",
+      "connect",
+      "cors",
+      "http-errors",
+      "json-schema",
+      "mime",
+      "send",
+      "sockjs"
     ]
   },
   "angularCompilerOptions": {
@@ -29,5 +61,12 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "include": [
+    "src/**/*.ts"  // Include all TypeScript files in the src directory
+  ],
+  "exclude": [
+    "node_modules",  // Exclude node_modules folder
+    "**/*.spec.ts"   // Optionally exclude test files
+  ]
 }

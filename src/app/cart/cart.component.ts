@@ -45,7 +45,7 @@ export class CartComponent implements OnInit {
   plusMinusCount(data: any, thing : string)
   {
     this.storeCartArray = [];
-    this.totalAmount=0;
+    this.totalAmount=0; 
     var plusMinusVal= data.plusMinusCounter;
     if (thing == 'plus'){
       plusMinusVal= plusMinusVal + 1;
