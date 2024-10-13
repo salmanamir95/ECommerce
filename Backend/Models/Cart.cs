@@ -7,6 +7,9 @@ namespace Backend.Models
 {
     public class Cart
     {
-        public int id { get; set; }
+        public int user_id { get; set; }
+
+        public List<CartItem>? Products { get; set; }= new List<CartItem>();
+
     }
 }

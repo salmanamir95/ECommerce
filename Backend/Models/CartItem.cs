@@ -8,5 +8,9 @@ namespace Backend.Models
     public class CartItem
     {
         public int ProductID { get; set; }
+
+        public int quantity { get; set; }
+
+        
     }
 }
