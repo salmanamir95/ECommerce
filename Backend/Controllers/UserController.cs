@@ -6,6 +6,7 @@ using Backend.Data;
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.SqlServer.Scaffolding.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
@@ -33,7 +34,7 @@ namespace Backend.Controllers
     {
       try
       {
-        List<User_detail> users= new List<User_detail>();
+        List<User_detail> users = new List<User_detail>();
         using (SqlConnection connect = new SqlConnection(_conn))
         {
           connect.Open();
@@ -42,32 +43,97 @@ namespace Backend.Controllers
           {
             using (SqlDataReader reader = command.ExecuteReader())
             {
-              while(reader.Read())
+              while (reader.Read())
               {
-                User_detail user = new User_detail{
-                Uid= Convert.ToInt32(reader["Uid"]),
-                Username= Convert.ToString(reader["Username"]),
-                Password= Convert.ToString(reader["Password"]),
-                UserOtherInfo= new User_Other_Info{
-                  Uid= Convert.ToInt32(reader["Uid"]),
-                  Email= Convert.ToString(reader["Email"]),
-                  PhoneNumber= Convert.ToString(reader["PhoneNumber"])
-                }
+                User_detail user = new User_detail
+                {
+                  Uid = Convert.ToInt32(reader["Uid"]),
+                  Username = Convert.ToString(reader["Username"]),
+                  Password = Convert.ToString(reader["Password"]),
+                  UserOtherInfo = new User_Other_Info
+                  {
+                    Uid = Convert.ToInt32(reader["Uid"]),
+                    Email = Convert.ToString(reader["Email"]),
+                    PhoneNumber = Convert.ToString(reader["PhoneNumber"])
+                  }
                 };
                 users.Add(user);
               }
             }
           }
+          connect.Close();
         }
-        return new GR<List<User_detail>> {
-          Success= true,
-          Object= users,
-          Msg= "all ok"
+        return new GR<List<User_detail>>
+        {
+          Success = true,
+          Object = users,
+          Msg = "all ok"
         };
       }
       catch (Exception error)
       {
         return new GR<List<User_detail>>
+        {
+          Success = false,
+          Msg = error.Message
+        };
+      }
+    }
+
+
+    [HttpPost("Login")]
+    public GR<bool> login( string username, string password)
+    {
+      try
+      {
+        using (SqlConnection connect = new SqlConnection(_conn))
+        {
+
+          string query = @"
+            SELECT *
+            FROM _user_detail AS U
+            JOIN _user_other_info AS I ON U.UID = I.UID
+            WHERE U.username = @Username AND U.password = @Password;
+        ";
+          using (SqlCommand command = new SqlCommand(query, connect))
+          {
+            command.Parameters.AddWithValue("@Username", username);
+            command.Parameters.AddWithValue("@Password", password);
+
+            connect.Open();
+
+            using (SqlDataReader reader = command.ExecuteReader())
+            {
+              while (reader.Read())
+              {
+                if (reader.HasRows)
+                {
+                  return new GR<bool>
+                  {
+                    Success = true,
+                    Object = true,
+                    Msg = "Found"
+                  };
+                }
+
+
+
+              }
+            }
+            connect.Close();
+          }
+          return new GR<bool>
+          {
+            Success = true,
+            Object = false,
+            Msg = "Not Found"
+          };
+
+        }
+      }
+      catch (Exception error)
+      {
+        return new GR<bool>
         {
           Success = false,
           Msg = error.Message
