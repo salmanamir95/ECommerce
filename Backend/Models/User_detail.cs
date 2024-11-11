@@ -27,5 +27,7 @@ namespace Backend.Models
         public int Uid { get; init; }
 
         public virtual User_Other_Info? UserOtherInfo { get; set; }
+
+        public List<Order>? orders { get; set; }
     }
 }

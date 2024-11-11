@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Models
 {
@@ -28,6 +29,6 @@ namespace Backend.Models
         [StringLength(15, MinimumLength = 7, ErrorMessage = "Phone number must be between 7 and 15 characters.")]
         public string PhoneNumber { get; set; } = string.Empty;
 
-        public virtual UserDetail UserDetail { get; set; }
+        public virtual User_detail? UserDetail { get; set; }
     }
 }

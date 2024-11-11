@@ -7,19 +7,21 @@ using System.Threading.Tasks;
 
 namespace Backend.Models
 {
-    public class Cart
+    public class Order
     {
         [Key]
-        public int cid { get; set; }
+        public int Oid { get; set; }
 
         [ForeignKey("User_detail")]
         [Required(ErrorMessage = "User ID is required")]
         public int Uid { get; set; }
 
-        public List<Item> Items { get; set; }= new List<Item>();
+        [ForeignKey("Cart")]
+        [Required(ErrorMessage = "Cart ID is required")]
+        public int Cid { get; set; }
 
         public virtual User_detail? user { get; set; }
 
-        // public virtual Item? item { get; set; }
+        public virtual Cart? cart { get; set; }
     }
 }

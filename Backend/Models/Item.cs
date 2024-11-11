@@ -23,6 +23,6 @@ namespace Backend.Models
         public int Cid { get; set; }
 
         // Navigation property for the related Category
-        public virtual Category Category { get; set; }
+        public virtual Category? Category { get; set; }
     }
 }
