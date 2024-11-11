@@ -142,3 +142,17 @@ namespace Backend.Controllers
     }
   }
 }
+
+
+// ### 6. `User_detail.cs`
+// - **CreateUserProfile(string name, string email, string password)**: Adds a new user profile.
+// - **UpdateUserProfile(int userId, string newName, string newEmail)**: Updates user details.
+// - **GetUserProfile(int userId)**: Retrieves the profile information of a user.
+// - **AuthenticateUser(string email, string password)**: Checks if user credentials are valid.
+// - **DeleteUserProfile(int userId)**: Deletes a user profile.
+
+// ### 7. `User_Other_Info.cs`
+// - **AddUserOtherInfo(int userId, string address, string phoneNumber)**: Adds additional information for a user.
+// - **UpdateUserOtherInfo(int userId, string newAddress, string newPhoneNumber)**: Updates additional information for a user.
+// - **GetUserOtherInfo(int userId)**: Retrieves other information related to a user.
+// - **DeleteUserOtherInfo(int userId)**: Deletes additional information related to a user.
