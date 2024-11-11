@@ -23,13 +23,9 @@ namespace Backend.Models
         }
         private string _password = string.Empty;
 
+        [Key]
         public int Uid { get; init; }
 
-        public User_detail(int uid, string username, string password)
-        {
-            Uid = uid;
-            Username = username; // Validates through property setter
-            Password = password; // Validates through property setter
-        }
+        public virtual User_Other_Info? UserOtherInfo { get; set; }
     }
 }
