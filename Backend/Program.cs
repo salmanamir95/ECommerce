@@ -4,15 +4,17 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ApplicationDBContext>(
-  options => {
+// Add DbContext with the connection string from appsettings.json
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
+{
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-  }
-);
+});
+
+// Add controllers to the container (this is needed for controllers to work)
+builder.Services.AddControllers();  // <-- Add this line
 
 var app = builder.Build();
 
@@ -24,5 +26,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Map controllers
+app.MapControllers(); // <-- Add this line to map the controllers
 
 app.Run();

@@ -176,3 +176,6 @@ D:\Github Projects\ECommerce\Backend\obj\Debug\net8.0\refint\Backend.dll
 D:\Github Projects\ECommerce\Backend\obj\Debug\net8.0\Backend.pdb
 D:\Github Projects\ECommerce\Backend\obj\Debug\net8.0\Backend.genruntimeconfig.cache
 D:\Github Projects\ECommerce\Backend\obj\Debug\net8.0\ref\Backend.dll
+D:\Github Projects\ECommerce\Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Binder.dll
+D:\Github Projects\ECommerce\Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.FileExtensions.dll
+D:\Github Projects\ECommerce\Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Json.dll
