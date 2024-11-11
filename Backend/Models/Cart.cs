@@ -18,6 +18,8 @@ namespace Backend.Models
 
         public List<Item> Items { get; set; }= new List<Item>();
 
+        public List<Order> orders { get; set; }= new List<Order>();
+
         public virtual User_detail? user { get; set; }
 
         // public virtual Item? item { get; set; }
