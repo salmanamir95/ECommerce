@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.Data;
+using Backend.ForJSON;
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -45,6 +46,7 @@ namespace Backend.Controllers
             {
               while (reader.Read())
               {
+
                 User_detail user = new User_detail
                 {
                   Uid = Convert.ToInt32(reader["Uid"]),
@@ -60,8 +62,8 @@ namespace Backend.Controllers
                 users.Add(user);
               }
             }
-          }
           connect.Close();
+          }
         }
         return new GR<List<User_detail>>
         {
@@ -82,7 +84,7 @@ namespace Backend.Controllers
 
 
     [HttpPost("Login")]
-    public GR<bool> login( string username, string password)
+    public GR<bool> login(Login log)
     {
       try
       {
@@ -97,8 +99,8 @@ namespace Backend.Controllers
         ";
           using (SqlCommand command = new SqlCommand(query, connect))
           {
-            command.Parameters.AddWithValue("@Username", username);
-            command.Parameters.AddWithValue("@Password", password);
+            command.Parameters.AddWithValue("@Username", log.username);
+            command.Parameters.AddWithValue("@Password", log.password);
 
             connect.Open();
 
@@ -115,9 +117,9 @@ namespace Backend.Controllers
                     Msg = "Found"
                   };
                 }
+                else{
 
-
-
+                }
               }
             }
             connect.Close();
@@ -140,8 +142,92 @@ namespace Backend.Controllers
         };
       }
     }
+    [HttpPost("CreateUserProfile")]
+
+    public GR<bool> CreateUserProfile(SignUp user)
+    {
+      try
+      {
+        using (SqlConnection connect = new SqlConnection(_conn))
+        {
+          connect.Open();
+
+          // Check if the username already exists
+          string query1 = @"SELECT *
+                              FROM _user_detail AS U
+                              JOIN _user_other_info AS I ON U.UID = I.UID
+                              WHERE U.username = @Username";
+
+
+          using (SqlCommand command = new SqlCommand(query1, connect))
+          {
+            command.Parameters.AddWithValue("@Username", user.Username);
+            using (SqlDataReader reader = command.ExecuteReader())
+            {
+              if (reader.HasRows)
+              {
+                return new GR<bool>
+                {
+                  Success = false,
+                  Object = false,
+                  Msg = "Username already exists"
+                };
+              }
+            }
+          }
+
+          // Insert into _user_detail and _user_other_info
+          string query2 = @"INSERT INTO _user_detail (Username, Password)
+                              VALUES (@user_name, @password);
+
+                              SELECT SCOPE_IDENTITY();"; // Get the UID of the new user
+
+          int userId = 0;
+          using (SqlCommand cmd2 = new SqlCommand(query2, connect))
+          {
+            cmd2.Parameters.AddWithValue("@user_name", user.Username);
+            cmd2.Parameters.AddWithValue("@password", user.Password);
+
+            // Execute the INSERT and get the new user ID
+            userId = Convert.ToInt32(cmd2.ExecuteScalar());
+          }
+
+          // Insert into _user_other_info
+          string query3 = @"INSERT INTO _user_other_info (UID, Email, PhoneNumber)
+                              VALUES (@UID, @Email, @PhoneNumber)";
+
+          using (SqlCommand cmd3 = new SqlCommand(query3, connect))
+          {
+            cmd3.Parameters.AddWithValue("@UID", userId);
+            cmd3.Parameters.AddWithValue("@Email", user.Email);
+            cmd3.Parameters.AddWithValue("@PhoneNumber", user.PhoneNumber);
+
+            cmd3.ExecuteNonQuery(); // Execute the insert for other info
+          }
+
+          return new GR<bool>
+          {
+            Success = true,
+            Object = true,
+            Msg = "User profile created successfully"
+          };
+        }
+      }
+      catch (Exception ex)
+      {
+        // Log the exception if necessary
+        return new GR<bool>
+        {
+          Success = false,
+          Object = false,
+          Msg = "An error occurred: " + ex.Message
+        };
+      }
+    }
+
   }
 }
+
 
 
 // ### 6. `User_detail.cs`
