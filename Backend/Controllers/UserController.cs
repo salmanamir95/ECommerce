@@ -62,7 +62,7 @@ namespace Backend.Controllers
                 users.Add(user);
               }
             }
-          connect.Close();
+            connect.Close();
           }
         }
         return new GR<List<User_detail>>
@@ -117,7 +117,8 @@ namespace Backend.Controllers
                     Msg = "Found"
                   };
                 }
-                else{
+                else
+                {
 
                 }
               }
@@ -221,6 +222,58 @@ namespace Backend.Controllers
           Success = false,
           Object = false,
           Msg = "An error occurred: " + ex.Message
+        };
+      }
+    }
+
+    //EDITING IN THE END
+
+    [HttpDelete("DeleteUser")]
+
+    public GR<bool> DeleteUserProfile(Login user)
+    {
+      try
+      {
+        using (SqlConnection connect = new SqlConnection(_conn))
+        {
+          connect.Open();
+
+          // Corrected query with a proper WHERE clause
+          string query1 = "DELETE FROM _user_detail WHERE username = @Username";
+
+          using (SqlCommand command = new SqlCommand(query1, connect))
+          {
+            // Add the parameter for username
+            command.Parameters.AddWithValue("@Username", user.username);
+
+            // Execute the DELETE command
+            int rowsAffected = command.ExecuteNonQuery();
+
+            // Optionally check if any rows were deleted
+            if (rowsAffected == 0)
+            {
+              return new GR<bool>
+              {
+                Success = false,
+                Msg = "No user found with the specified username."
+              };
+            }
+          }
+
+          connect.Close();
+        }
+
+        return new GR<bool>
+        {
+          Success = true
+        };
+      }
+      catch (Exception Ex)
+      {
+        return new GR<bool>
+        {
+          Success = false,
+          Msg = "Error= " + Ex.Message
         };
       }
     }
