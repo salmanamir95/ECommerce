@@ -27,7 +27,6 @@ namespace Backend.ForJSON
         private string _password = string.Empty;
 
 
-        [Key]
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email format.")]
         [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters.")]

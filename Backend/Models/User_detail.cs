@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace Backend.Models
 {
@@ -26,8 +27,13 @@ namespace Backend.Models
         [Key]
         public int Uid { get; init; }
 
+        // Navigation property for the related Cart (one-to-one relationship)
+        public virtual Cart? Cart { get; set; }  // One User has One Cart
+
+        // Navigation property for the related User_Other_Info (one-to-one relationship)
         public virtual User_Other_Info? UserOtherInfo { get; set; }
 
-
+        // Navigation property for the related Orders (one-to-many relationship)
+        public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }

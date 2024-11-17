@@ -58,6 +58,7 @@ namespace Backend.Controllers
                     Email = Convert.ToString(reader["Email"]),
                     PhoneNumber = Convert.ToString(reader["PhoneNumber"])
                   }
+
                 };
                 users.Add(user);
               }
