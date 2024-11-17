@@ -13,15 +13,11 @@ namespace Backend.Models
         public int Oid { get; set; }
 
         [ForeignKey("User_detail")]
-        [Required(ErrorMessage = "User ID is required")]
-        public int Uid { get; set; }
-
-        [ForeignKey("Cart")]
-        [Required(ErrorMessage = "Cart ID is required")]
-        public int Cid { get; set; }
-
         public virtual User_detail? user { get; set; }
 
+        [ForeignKey("Cart")]
         public virtual Cart? cart { get; set; }
+
+
     }
 }

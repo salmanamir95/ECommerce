@@ -28,6 +28,6 @@ namespace Backend.Models
 
         public virtual User_Other_Info? UserOtherInfo { get; set; }
 
-        public List<Order>? orders { get; set; }
+
     }
 }
