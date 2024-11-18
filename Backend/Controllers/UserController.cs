@@ -191,7 +191,7 @@ namespace Backend.Controllers
           }
 
           // Insert into _user_other_info
-          string query3 = @"INSERT INTO _user_other_info (UID, Email, PhoneNumber)
+          string query3 = @"INSERT INTO user_other_info (UID, Email, PhoneNumber)
                               VALUES (@UID, @Email, @PhoneNumber)";
 
           using (SqlCommand cmd3 = new SqlCommand(query3, connect))
@@ -236,7 +236,7 @@ namespace Backend.Controllers
           connect.Open();
 
           // Corrected query with a proper WHERE clause
-          string query1 = "DELETE FROM _user_detail WHERE username = @Username";
+          string query1 = "DELETE FROM user_detail WHERE username = @Username";
 
           using (SqlCommand command = new SqlCommand(query1, connect))
           {

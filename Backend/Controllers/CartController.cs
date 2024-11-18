@@ -33,40 +33,76 @@ namespace Backend.Controllers
     {
       try
       {
-        using (SqlConnection connect = new SqlConnection(_conn))
+        if (_items == null)
         {
-          // Insert into _user_detail and _user_other_info
-          string query2 = @"INSERT INTO cart (Username, Password)
-                              VALUES (@user_name, @password);
-
-                              SELECT SCOPE_IDENTITY();"; // Get the UID of the new user
-
-          int userId = 0;
-          using (SqlCommand cmd2 = new SqlCommand(query2, connect))
-          {
-            cmd2.Parameters.AddWithValue("@user_name", user.Username);
-            cmd2.Parameters.AddWithValue("@password", user.Password);
-
-            // Execute the INSERT and get the new user ID
-            userId = Convert.ToInt32(cmd2.ExecuteScalar());
-          }
           return new GR<bool>
           {
-            Success = true,
-            Object = true,
-            Msg = "User profile created successfully"
+            Success = false,
+            Msg = "Invalid input data."
           };
         }
+
+        using (SqlConnection connect = new SqlConnection(_conn))
+        {
+          // Ensure the connection is opened
+          connect.Open();
+
+          string query2 = @"INSERT INTO CART (UID, CID, IID, IQuantity, CreatedAt)
+                              VALUES (@UID, @CID, @IID, @IQ, @CreatedAt);";
+
+          using (SqlCommand cmd2 = new SqlCommand(query2, connect))
+          {
+            // Adding parameters for SQL command
+            cmd2.Parameters.AddWithValue("@UID", _items.Userid);
+            cmd2.Parameters.AddWithValue("@CID", _items.cartId);
+            cmd2.Parameters.AddWithValue("@IID", _items.Itemid);
+            cmd2.Parameters.AddWithValue("@IQ", _items.quantity);
+            cmd2.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
+
+            // Execute the command
+            int rows = cmd2.ExecuteNonQuery();
+
+            // Check if the operation was successful
+            if (rows > 0)
+            {
+              return new GR<bool>
+              {
+                Success = true,
+                Object = true,
+                Msg = "Item added to cart successfully."
+              };
+            }
+            else
+            {
+              return new GR<bool>
+              {
+                Success = false,
+                Msg = "Failed to add item to cart. No rows affected."
+              };
+            }
+          }
+        }
       }
-      catch (Exception err)
+      catch (SqlException sqlEx)
       {
+        // Handle SQL-specific errors
         return new GR<bool>
         {
           Success = false,
-          Msg = err.Message
+          Msg = "Database error: " + sqlEx.Message
+        };
+      }
+      catch (Exception ex)
+      {
+        // General exception handling
+        return new GR<bool>
+        {
+          Success = false,
+          Msg = "Error: " + ex.Message
         };
       }
     }
+
   }
 }
 
