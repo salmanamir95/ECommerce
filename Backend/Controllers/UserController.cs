@@ -39,7 +39,7 @@ namespace Backend.Controllers
         using (SqlConnection connect = new SqlConnection(_conn))
         {
           connect.Open();
-          string query = "SELECT * FROM _user_detail AS U JOIN _user_other_info AS I ON U.UID = I.UID;";
+          string query = "SELECT * FROM User_detail AS U JOIN User_Other_Info AS I ON U.UID = I.UID;";
           using (SqlCommand command = new SqlCommand(query, connect))
           {
             using (SqlDataReader reader = command.ExecuteReader())
@@ -94,8 +94,8 @@ namespace Backend.Controllers
 
           string query = @"
             SELECT *
-            FROM _user_detail AS U
-            JOIN _user_other_info AS I ON U.UID = I.UID
+            FROM User_detail AS U
+            JOIN User_other_info AS I ON U.UID = I.UID
             WHERE U.username = @Username AND U.password = @Password;
         ";
           using (SqlCommand command = new SqlCommand(query, connect))
@@ -117,10 +117,6 @@ namespace Backend.Controllers
                     Object = true,
                     Msg = "Found"
                   };
-                }
-                else
-                {
-
                 }
               }
             }
@@ -156,8 +152,8 @@ namespace Backend.Controllers
 
           // Check if the username already exists
           string query1 = @"SELECT *
-                              FROM _user_detail AS U
-                              JOIN _user_other_info AS I ON U.UID = I.UID
+                              FROM User_detail AS U
+                              JOIN User_other_info AS I ON U.UID = I.UID
                               WHERE U.username = @Username";
 
 
@@ -179,7 +175,7 @@ namespace Backend.Controllers
           }
 
           // Insert into _user_detail and _user_other_info
-          string query2 = @"INSERT INTO _user_detail (Username, Password)
+          string query2 = @"INSERT INTO User_detail (Username, Password)
                               VALUES (@user_name, @password);
 
                               SELECT SCOPE_IDENTITY();"; // Get the UID of the new user
