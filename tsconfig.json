@@ -1,0 +1,72 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "useDefineForClassFields": false,
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
+    // "typeRoots": [
+    //   "node_modules/@types"  // Ensure type definitions are sourced from node_modules
+    // ],
+    // "types": [
+    //   "node", 
+    //   "body-parser", 
+    //   "bonjour", 
+    //   "connect", 
+    //   "cors", 
+    //   "http-errors", 
+    //   "http-proxy", 
+    //   "jasmine", 
+    //   "json-schema", 
+    //   "mime", 
+    //   "range-parser", 
+    //   "send", 
+    //   "sockjs"
+    // ]
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "types": [
+      "node",
+      "body-parser",
+      "bonjour",
+      "connect",
+      "cors",
+      "http-errors",
+      "json-schema",
+      "mime",
+      "send",
+      "sockjs"
+    ]
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "include": [
+    "src/**/*.ts"  // Include all TypeScript files in the src directory
+  ],
+  "exclude": [
+    "node_modules",  // Exclude node_modules folder
+    "**/*.spec.ts"   // Optionally exclude test files
+  ]
+}

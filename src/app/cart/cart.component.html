@@ -1,0 +1,75 @@
+<app-navbar></app-navbar>
+
+<main class="container-fluid mt-5 mb-5">
+    <div class="row">
+        <div *ngIf="totalCartData == 0">
+            <h1>Cart is empty!</h1>
+        </div>
+        <div *ngIf="totalCartData !=0">
+            <div class="col-lg-8" *ngFor="let data of getCartData">
+                <!-- cart content  -->
+                <div class="row">
+                    <div class="col-lg-4 m-5">
+                        <img src="{{data.img}}" width="50%">
+                    </div>
+                    <div class="col-lg-8 col-12">
+                        <h4>{{data.name}}</h4>
+                        <p>Rs {{data.price}}</p>
+                        <button class="btn btn-sm btn-danger" (click)="removeCart(data)"> <i class="bi bi-trash"></i>
+                            Remove</button>
+                        <div class="mt-2 mb-2">
+
+                            <button class="btn btn-primary btn-sm" [disabled]="data.plusMinusCounter > 1 ? false : true" (click)="plusMinusCount(data, 'minus')">-</button>
+                            &nbsp;
+                            <input type="number" class="col-lg-2" value="{{data.plusMinusCounter}}"> &nbsp;
+                            <button class="btn btn-primary btn-sm" (click)="plusMinusCount(data, 'plus')">+</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <!-- price  -->
+                <div class="priceBox">
+                    <h5 class="fw-bold">Price Details </h5>
+                    <hr>
+                    <div *ngFor="let data of getCartData">
+                        <div class="clearfix">
+                            <p>
+                                <span class="float-start">
+                                    Price({{totalCartData}})
+                                </span>
+                                <span class="float-end">
+                                    {{data.price}}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <p>
+                            <span class="float-start">
+                                Delivery
+                            </span>
+                            <span class="float-end">
+                                Free
+                            </span>
+                        </p>
+                    </div>
+                    <!-- ----Total Amount---- -->
+                    <div class="clearfix">
+                        <p>
+                            <span class="float-start">
+                                Total
+                            </span>
+                            <span class="float-end">
+                                {{totalAmount | number}}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <button class="btn btn-md btn-warning">Place Order</button>
+            </div>
+
+        </div>
+    </div>
+</main>

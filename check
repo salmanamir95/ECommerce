@@ -1,0 +1,14 @@
+[1mdiff --git a/angular.json b/angular.json[m
+[1mindex 15ee981..53b2ab9 100644[m
+[1m--- a/angular.json[m
+[1m+++ b/angular.json[m
+[36m@@ -112,6 +112,7 @@[m
+   "cli": {[m
+     "schematicCollections": [[m
+       "@angular-eslint/schematics"[m
+[31m-    ][m
+[32m+[m[32m    ],[m
+[32m+[m[32m    "analytics": "32af6247-5208-4304-ba10-fb3ebfb4c603"[m
+   }[m
+ }[m
+\ No newline at end of file[m

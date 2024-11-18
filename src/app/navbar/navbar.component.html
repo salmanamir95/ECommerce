@@ -1,0 +1,16 @@
+<nav class="container-fluid bg-white py-2 shadow-sm">
+    <div class="row">
+        <div class="col-lg-4 col-12">
+            <div class="logo-container">
+                <img src="../../assets/Logo/PakSoleStudio.webp" alt="PakSoleStudio Logo" class="logo-icon">
+                <a class="brand" routerLink="/">PakSoleStudio</a>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-12 offset-lg-4 mt-3">
+            <a class="link" routerLink="/"> <i class="bi bi-house"></i>Home</a>
+            <a class="link" routerLink="/cart"><i class="bi bi-cart"></i> Cart: {{cartCount | number}}</a>
+        </div>
+    </div>
+    
+</nav>

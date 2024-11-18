@@ -1,0 +1,35 @@
+<app-navbar></app-navbar>
+
+<p>You got the products of {{getParamValue}}</p>
+
+<main class="container-fluid mt-5 mb-5">
+    <div class="row pagebox">
+        <div class="col-lg-4 col-12">
+            <!-- filter -->
+            <p>filter</p>
+            <p>Category: {{getParamValue | titlecase}}</p>
+            <p>Subcategories: </p>
+            <div class="col-lg-4 col-12 mt-3">
+                <select class="form-select form-select-sm" (change)="filterSelect($event)">
+                    <option value="all">All</option>
+                    <option *ngFor="let data of subcategoriesProductData" value="{{data.subcategories}}">
+                        {{data.subcategories}} </option>
+                </select>
+            </div>
+        </div>
+        <div class="m-2 p-2 col-lg-8 col-12 mt-5">
+            <!-- product content -->
+            <div class="row pagecontent mt-5" *ngFor="let data of getProductData; index as i">
+                <div class="col-lg-4 col-12">
+                    <img src="{{data.img}}">
+                </div>
+                <div class="col-lg-8 col-12 mt-3">
+                    <h4>{{data.category}}</h4>
+                    <p>Rs {{data.price}}</p>
+                    <a class="btn btn-sm btn-dark" [routerLink]="['/product-detail', data.category, data.id]"> view
+                        product <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

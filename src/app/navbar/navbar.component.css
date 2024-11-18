@@ -1,0 +1,39 @@
+.brand{
+    font-size: 30px;
+    font-weight: bold;
+    color:black;
+    text-decoration: none;
+    padding: 0px 30px;
+}
+
+.link{
+    font-size: 18px;
+    color:black;
+    text-decoration: none;
+    padding: 0px 10px;
+}
+
+.link:hover{
+    color: blue;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-icon {
+    width: 40px; /* Adjust size for the logo icon */
+    height: 40px;
+    margin-right: 10px; /* Space between logo and text */   
+}
+
+.brand:hover {
+    color: #08f004; /* Hover effect to match your theme */
+}
+
+@media screen and (max-width : 600px) {
+    .brand{
+        padding: 0px 10px;
+    }
+}
