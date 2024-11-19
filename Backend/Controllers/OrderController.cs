@@ -71,14 +71,148 @@ namespace Backend.Controllers
           };
         }
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
-        return new GR<List<Order>> {
-          Success=false,
-          Msg= ex.Message
+        return new GR<List<Order>>
+        {
+          Success = false,
+          Msg = ex.Message
         };
       }
     }
+
+    [HttpPost("Genreate_Receipt")]
+
+    public GR<Receipt> GenerateReceipt(OrderFromCustomer total)
+{
+    try
+    {
+        using (SqlConnection connect = new SqlConnection(_conn))
+        {
+            connect.Open();
+
+            // To track feasibility
+            List<string> insufficientItems = new List<string>();
+            Dictionary<int, int> cartItemsQuantities = new Dictionary<int, int>(); // Stores itemId and cart quantity
+
+            foreach (var item in total.IID)
+            {
+                string query = @"SELECT CART.IQuantity, ITEM.Quantity, ITEM.Name
+                                 FROM ITEM
+                                 JOIN CART ON ITEM.ITEMID = CART.IID
+                                 WHERE CART.UID = @UID AND CART.IID = @IID AND CART.CID = @CID";
+                using (SqlCommand cmd = new SqlCommand(query, connect))
+                {
+                    cmd.Parameters.AddWithValue("@UID", total.Uid);
+                    cmd.Parameters.AddWithValue("@IID", item);
+                    cmd.Parameters.AddWithValue("@CID", total.CartId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int cartQuantity = reader.GetInt32(0);
+                            int stockQuantity = reader.GetInt32(1);
+                            string itemName = reader.GetString(2);
+
+                            if (cartQuantity > stockQuantity)
+                            {
+                                insufficientItems.Add($"{itemName} (Requested: {cartQuantity}, Available: {stockQuantity})");
+                            }
+                            else
+                            {
+                                cartItemsQuantities[item] = cartQuantity;
+                            }
+                        }
+                        else
+                        {
+                            return new GR<Receipt>
+                            {
+                                Success = false,
+                                Msg = $"Item with ID {item} not found in cart."
+                            };
+                        }
+                    }
+                }
+            }
+
+            // Check if any items were insufficient
+            if (insufficientItems.Any())
+            {
+                return new GR<Receipt>
+                {
+                    Success = false,
+                    Msg = $"Insufficient stock for: {string.Join(", ", insufficientItems)}"
+                };
+            }
+
+            // Generate receipt (update stock and create receipt entry)
+            using (SqlTransaction transaction = connect.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var cartItem in cartItemsQuantities)
+                    {
+                        string updateStockQuery = @"UPDATE ITEM
+                                                    SET Quantity = Quantity - @Quantity
+                                                    WHERE ITEMID = @IID";
+                        using (SqlCommand updateCmd = new SqlCommand(updateStockQuery, connect, transaction))
+                        {
+                            updateCmd.Parameters.AddWithValue("@Quantity", cartItem.Value);
+                            updateCmd.Parameters.AddWithValue("@IID", cartItem.Key);
+                            updateCmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    // Assuming Receipt table exists for storing receipt details
+                    // string insertReceiptQuery = @"INSERT INTO (UID, CID, CreatedAt, PaymentMethod, Description)
+                    //                               OUTPUT INSERTED.ReceiptID
+                    //                               VALUES (@UID, @CID, @CreatedAt, @PaymentMethod, @Desc)";
+                    //int receiptId;
+                    // using (SqlCommand receiptCmd = new SqlCommand(insertReceiptQuery, connect, transaction))
+                    // {
+                    //     receiptCmd.Parameters.AddWithValue("@UID", total.Uid);
+                    //     receiptCmd.Parameters.AddWithValue("@CID", total.CartId);
+                    //     receiptCmd.Parameters.AddWithValue("@CreatedAt", total.CreatedAt);
+                    //     receiptCmd.Parameters.AddWithValue("@PaymentMethod", total.PaymentMethod);
+                    //     receiptCmd.Parameters.AddWithValue("@Desc", total.Desc ?? string.Empty);
+                    //     receiptId = (int)receiptCmd.ExecuteScalar();
+                    // }
+
+                    // transaction.Commit();
+
+                    // // Return the receipt details
+                    return new GR<Receipt>
+                    {
+                        Success = true,
+                        Object = new Receipt
+                        {
+                            UserId = total.Uid,
+                            CartId = total.CartId,
+                            CreatedAt = total.CreatedAt,
+                            PaymentMethod = total.PaymentMethod,
+                            Description = total.Desc
+                        }
+                    };
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        return new GR<Receipt>
+        {
+            Success = false,
+            Msg = ex.Message
+        };
+    }
+}
+
 
   }
 }
