@@ -49,6 +49,27 @@ namespace Backend.Controllers
           // Ensure the connection is opened
           connect.Open();
 
+          string query1 = "SELECT QUANTITY FROM ITEMS WHERE ITEMID = @IID;";
+          int quantity =0;
+          using (SqlCommand cmd1 = new SqlCommand(query1, connect))
+          {
+            cmd1.Parameters.AddWithValue("@IID", _items.Itemid);
+            object result = cmd1.ExecuteScalar();
+
+            // Check if the result is not null before casting
+            quantity = (result != DBNull.Value) ? Convert.ToInt32(result) : 0;
+          }
+
+          if(_items.quantity > quantity)
+          {
+            connect.Close();
+            return new GR<bool>{
+              Success= false,
+              Msg= "Not enough quantity"
+            };
+          }
+
+
           string query2 = @"INSERT INTO CART (UID, CID, IID, IQuantity, CreatedAt)
                               VALUES (@UID, @CID, @IID, @IQ, @CreatedAt);";
 
@@ -245,7 +266,7 @@ namespace Backend.Controllers
     {
       try
       {
-        List<ReturnQuantityInfoPerItem> MyData= new List<ReturnQuantityInfoPerItem>();
+        List<ReturnQuantityInfoPerItem> MyData = new List<ReturnQuantityInfoPerItem>();
         // Validate input data
         if (_cart == null || _cart.Userid <= 0 || _cart.cartId <= 0)
         {
@@ -272,13 +293,15 @@ namespace Backend.Controllers
             // Add parameters to prevent SQL injection
             cmd.Parameters.Add("@UID", SqlDbType.Int).Value = _cart.Userid;
             cmd.Parameters.Add("@CID", SqlDbType.Int).Value = _cart.cartId;
-            using (SqlDataReader reader= cmd.ExecuteReader())
+            using (SqlDataReader reader = cmd.ExecuteReader())
             {
-              while(reader.Read()){
-                ReturnQuantityInfoPerItem user_thing = new ReturnQuantityInfoPerItem{
-                  UserCartInfo= _cart,
-                  itemId= Convert.ToInt32(reader["IID"]),
-                  quantity= Convert.ToInt32(reader["IQuantity"])
+              while (reader.Read())
+              {
+                ReturnQuantityInfoPerItem user_thing = new ReturnQuantityInfoPerItem
+                {
+                  UserCartInfo = _cart,
+                  itemId = Convert.ToInt32(reader["IID"]),
+                  quantity = Convert.ToInt32(reader["IQuantity"])
                 };
                 MyData.Add(user_thing);
               }
@@ -289,9 +312,10 @@ namespace Backend.Controllers
           }
           connect.Close();
         }
-        return new GR<List<ReturnQuantityInfoPerItem>>{
-          Success=true,
-          Object=MyData,
+        return new GR<List<ReturnQuantityInfoPerItem>>
+        {
+          Success = true,
+          Object = MyData,
 
         };
       }
@@ -311,7 +335,10 @@ namespace Backend.Controllers
 
     public GR<bool> Clear_Cart(CartTotal user_info)
     {
-      using (SqlConnection connect = new SqlConnection(_conn))
+      try
+      {
+
+        using (SqlConnection connect = new SqlConnection(_conn))
         {
           // Ensure the connection is opened
           connect.Open();

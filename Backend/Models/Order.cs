@@ -27,5 +27,9 @@ namespace Backend.Models
         public int IID { get; set; }
 
         public Item? item { get; set; }
+
+        public string? Desc { get; set; }
+
+        public char PaymentMethod { get; set; }
     }
 }
