@@ -307,6 +307,71 @@ namespace Backend.Controllers
       }
     }
 
+    [HttpPost("ClearCart")]
+
+    public GR<bool> Clear_Cart(CartTotal user_info)
+    {
+      using (SqlConnection connect = new SqlConnection(_conn))
+        {
+          // Ensure the connection is opened
+          connect.Open();
+
+          string query2 = @"DELETE FROM CART
+                              WHERE cart.UID= @UID AND CART.CID = @CID";
+
+          using (SqlCommand cmd2 = new SqlCommand(query2, connect))
+          {
+            // Adding parameters for SQL command
+            cmd2.Parameters.AddWithValue("@UID", user_info.Userid);
+            cmd2.Parameters.AddWithValue("@CID", user_info.cartId);
+
+
+            // Execute the command
+            int rows = cmd2.ExecuteNonQuery();
+
+            // Check if the operation was successful
+            if (rows > 0)
+            {
+              connect.Close();
+              return new GR<bool>
+              {
+                Success = true,
+                Object = true,
+                Msg = "Item deleted from cart successfully."
+              };
+            }
+            else
+            {
+              connect.Close();
+              return new GR<bool>
+              {
+                Success = false,
+                Msg = "Failed to delete item from cart. No rows affected."
+              };
+            }
+          }
+        }
+      }
+      catch (SqlException sqlEx)
+      {
+        // Handle SQL-specific errors
+        return new GR<bool>
+        {
+          Success = false,
+          Msg = "Database error: " + sqlEx.Message
+        };
+      }
+      catch (Exception ex)
+      {
+        // General exception handling
+        return new GR<bool>
+        {
+          Success = false,
+          Msg = "Error: " + ex.Message
+        };
+      }
+    }
+
   }
 }
 

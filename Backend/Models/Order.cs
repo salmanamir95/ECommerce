@@ -23,5 +23,9 @@ namespace Backend.Models
 
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public int IID { get; set; }
+
+        public Item? item { get; set; }
     }
 }
