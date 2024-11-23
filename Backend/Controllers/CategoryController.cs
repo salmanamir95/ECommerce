@@ -1,214 +1,208 @@
 using Microsoft.AspNetCore.Mvc;
+using Backend.Models;
 using Microsoft.Data.SqlClient;
-using System;
 using System.Collections.Generic;
-using System.Data;
+using System;
 using System.Threading.Tasks;
+using Backend.Data;
 
 namespace Backend.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CategoryController : ControllerBase
+  [ApiController]
+  [Route("api/[controller]")]
+  public class CategoryController : ControllerBase
+  {
+    private readonly ApplicationDBContext _context;
+    private readonly string? _conn;
+    private readonly IConfiguration _configuration;  // Declare IConfiguration
+
+    public CategoryController(ApplicationDBContext context, IConfiguration configuration)
     {
-        private readonly string _conn;
-
-        public CategoryController(IConfiguration configuration)
-        {
-            _conn = configuration.GetConnectionString("DefaultConnection"); // Assuming you have a DefaultConnection in your appsettings.json
-        }
-
-        // 1. AddCategory: Adds a new product category.
-        [HttpPost("AddCategory")]
-        public async Task<IActionResult> AddCategory([FromBody] Category category)
-        {
-            if (category == null)
-            {
-                return BadRequest("Category data is required.");
-            }
-
-            using (SqlConnection connect = new SqlConnection(_conn))
-            {
-                try
-                {
-                    await connect.OpenAsync();
-
-                    string query = "INSERT INTO Categories (CategoryName) VALUES (@CategoryName);";
-                    using (SqlCommand cmd = new SqlCommand(query, connect))
-                    {
-                        cmd.Parameters.AddWithValue("@CategoryName", category.CategoryName);
-
-                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                        if (rowsAffected > 0)
-                        {
-                            return CreatedAtAction(nameof(GetCategoryById), new { categoryId = category.Cid }, category);
-                        }
-                        else
-                        {
-                            return StatusCode(500, "Failed to add category.");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, $"Internal server error: {ex.Message}");
-                }
-            }
-        }
-
-        // 2. RemoveCategory: Removes a category by its ID.
-        [HttpDelete("RemoveCategory/{categoryId}")]
-        public async Task<IActionResult> RemoveCategory(int categoryId)
-        {
-            using (SqlConnection connect = new SqlConnection(_conn))
-            {
-                try
-                {
-                    await connect.OpenAsync();
-
-                    string query = "DELETE FROM Categories WHERE Cid = @CategoryId;";
-                    using (SqlCommand cmd = new SqlCommand(query, connect))
-                    {
-                        cmd.Parameters.AddWithValue("@CategoryId", categoryId);
-
-                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                        if (rowsAffected > 0)
-                        {
-                            return Ok($"Category with ID {categoryId} has been deleted.");
-                        }
-                        else
-                        {
-                            return NotFound($"Category with ID {categoryId} not found.");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, $"Internal server error: {ex.Message}");
-                }
-            }
-        }
-
-        // 3. UpdateCategory: Updates an existing category.
-        [HttpPut("UpdateCategory/{categoryId}")]
-        public async Task<IActionResult> UpdateCategory(int categoryId, [FromBody] Category updatedCategory)
-        {
-            if (updatedCategory == null || categoryId != updatedCategory.Cid)
-            {
-                return BadRequest("Category data is invalid.");
-            }
-
-            using (SqlConnection connect = new SqlConnection(_conn))
-            {
-                try
-                {
-                    await connect.OpenAsync();
-
-                    string query = "UPDATE Categories SET CategoryName = @CategoryName WHERE Cid = @CategoryId;";
-                    using (SqlCommand cmd = new SqlCommand(query, connect))
-                    {
-                        cmd.Parameters.AddWithValue("@CategoryId", categoryId);
-                        cmd.Parameters.AddWithValue("@CategoryName", updatedCategory.CategoryName);
-
-                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                        if (rowsAffected > 0)
-                        {
-                            return NoContent(); // No content indicates a successful update
-                        }
-                        else
-                        {
-                            return NotFound($"Category with ID {categoryId} not found.");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, $"Internal server error: {ex.Message}");
-                }
-            }
-        }
-
-        // 4. GetCategoryById: Retrieves a category by its ID.
-        [HttpGet("GetCategoryById/{categoryId}")]
-        public async Task<IActionResult> GetCategoryById(int categoryId)
-        {
-            using (SqlConnection connect = new SqlConnection(_conn))
-            {
-                try
-                {
-                    await connect.OpenAsync();
-
-                    string query = "SELECT * FROM Categories WHERE Cid = @CategoryId;";
-                    using (SqlCommand cmd = new SqlCommand(query, connect))
-                    {
-                        cmd.Parameters.AddWithValue("@CategoryId", categoryId);
-
-                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (await reader.ReadAsync())
-                            {
-                                var category = new Category
-                                {
-                                    Cid = reader.GetInt32(0),
-                                    CategoryName = reader.GetString(1)
-                                };
-
-                                return Ok(category);
-                            }
-                            else
-                            {
-                                return NotFound($"Category with ID {categoryId} not found.");
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, $"Internal server error: {ex.Message}");
-                }
-            }
-        }
-
-        // 5. GetAllCategories: Returns a list of all product categories.
-        [HttpGet("GetAllCategories")]
-        public async Task<IActionResult> GetAllCategories()
-        {
-            using (SqlConnection connect = new SqlConnection(_conn))
-            {
-                try
-                {
-                    await connect.OpenAsync();
-
-                    string query = "SELECT * FROM Categories;";
-                    using (SqlCommand cmd = new SqlCommand(query, connect))
-                    {
-                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                        {
-                            var categories = new List<Category>();
-
-                            while (await reader.ReadAsync())
-                            {
-                                var category = new Category
-                                {
-                                    Cid = reader.GetInt32(0),
-                                    CategoryName = reader.GetString(1)
-                                };
-
-                                categories.Add(category);
-                            }
-
-                            return Ok(categories);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, $"Internal server error: {ex.Message}");
-                }
-            }
-        }
+      _context = context;
+      _configuration = configuration;
+      _conn = _configuration.GetConnectionString("DefaultConnection");
     }
+
+    // Add a new Category (Asynchronous)
+    [HttpPost("AddCategory")]
+    public async Task<IActionResult> AddCategory([FromBody] Category category)
+    {
+      if (category == null || string.IsNullOrWhiteSpace(category.CategoryName))
+      {
+        return BadRequest(new { message = "Category name is required." });
+      }
+
+      try
+      {
+        using (SqlConnection connection = new SqlConnection(_conn))
+        {
+          await connection.OpenAsync();
+          string query = "INSERT INTO Categories (CategoryName) VALUES (@CategoryName)";
+
+          using (SqlCommand command = new SqlCommand(query, connection))
+          {
+            command.Parameters.AddWithValue("@CategoryName", category.CategoryName);
+            await command.ExecuteNonQueryAsync();
+          }
+
+          return Ok(new { message = "Category added successfully." });
+        }
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { message = ex.Message });
+      }
+    }
+
+    // Get a category by ID (Asynchronous)
+    [HttpGet("GetCategoryById/{categoryId}")]
+    public async Task<IActionResult> GetCategoryById(int categoryId)
+    {
+      try
+      {
+        using (SqlConnection connection = new SqlConnection(_conn))
+        {
+          await connection.OpenAsync();
+          string query = "SELECT * FROM Categories WHERE Cid = @Cid";
+
+          using (SqlCommand command = new SqlCommand(query, connection))
+          {
+            command.Parameters.AddWithValue("@Cid", categoryId);
+            using (SqlDataReader reader = await command.ExecuteReaderAsync())
+            {
+              if (await reader.ReadAsync())
+              {
+                var category = new Category
+                {
+                  Cid = (int)reader["Cid"],
+                  CategoryName = (string)reader["CategoryName"]
+                };
+                return Ok(category);
+              }
+              else
+              {
+                return NotFound(new { message = "Category not found." });
+              }
+            }
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { message = ex.Message });
+      }
+    }
+
+    // Update a Category (Asynchronous)
+    [HttpPut("UpdateCategory/{categoryId}")]
+    public async Task<IActionResult> UpdateCategory(int categoryId, [FromBody] Category category)
+    {
+      if (category == null || string.IsNullOrWhiteSpace(category.CategoryName))
+      {
+        return BadRequest(new { message = "Category name is required." });
+      }
+
+      try
+      {
+        using (SqlConnection connection = new SqlConnection(_conn))
+        {
+          await connection.OpenAsync();
+          string query = "UPDATE Categories SET CategoryName = @CategoryName WHERE Cid = @Cid";
+
+          using (SqlCommand command = new SqlCommand(query, connection))
+          {
+            command.Parameters.AddWithValue("@CategoryName", category.CategoryName);
+            command.Parameters.AddWithValue("@Cid", categoryId);
+            int rowsAffected = await command.ExecuteNonQueryAsync();
+
+            if (rowsAffected > 0)
+            {
+              return Ok(new { message = "Category updated successfully." });
+            }
+            else
+            {
+              return NotFound(new { message = "Category not found." });
+            }
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { message = ex.Message });
+      }
+    }
+
+    // Remove a Category (Asynchronous)
+    [HttpDelete("RemoveCategory/{categoryId}")]
+    public async Task<IActionResult> RemoveCategory(int categoryId)
+    {
+      try
+      {
+        using (SqlConnection connection = new SqlConnection(_conn))
+        {
+          await connection.OpenAsync();
+          string query = "DELETE FROM Categories WHERE Cid = @Cid";
+
+          using (SqlCommand command = new SqlCommand(query, connection))
+          {
+            command.Parameters.AddWithValue("@Cid", categoryId);
+            int rowsAffected = await command.ExecuteNonQueryAsync();
+
+            if (rowsAffected > 0)
+            {
+              return Ok(new { message = "Category deleted successfully." });
+            }
+            else
+            {
+              return NotFound(new { message = "Category not found." });
+            }
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { message = ex.Message });
+      }
+    }
+
+    // Get all Categories (Asynchronous)
+    [HttpGet("GetAllCategories")]
+    public async Task<IActionResult> GetAllCategories()
+    {
+      try
+      {
+        List<Category> categories = new List<Category>();
+
+        using (SqlConnection connection = new SqlConnection(_conn))
+        {
+          await connection.OpenAsync();
+          string query = "SELECT * FROM Categories";
+
+          using (SqlCommand command = new SqlCommand(query, connection))
+          using (SqlDataReader reader = await command.ExecuteReaderAsync())
+          {
+            while (await reader.ReadAsync())
+            {
+              var category = new Category
+              {
+                Cid = (int)reader["Cid"],
+                CategoryName = (string)reader["CategoryName"]
+              };
+              categories.Add(category);
+            }
+          }
+        }
+
+        return Ok(categories);
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { message = ex.Message });
+      }
+    }
+  }
 }
+
 
 // ### 2. `Category.cs`
 // - **AddCategory(string name, string description)**: Adds a new product category.
